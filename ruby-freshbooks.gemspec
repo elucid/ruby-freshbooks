@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.date = %q{2010-04-25}
   s.description = %q{simple FreshBooks API wrapper}
   s.email = %q{elucid@gmail.com}
-  s.files = ["README.md", "LICENSE", "VERSION", "ruby-freshbooks.gemspec", "lib/freshbooks.rb", "spec/freshbooks_spec.rb"]
+  s.files = ["README.md", "LICENSE", "VERSION", "ruby-freshbooks.gemspec", "lib/freshbooks.rb", "lib/ruby-freshbooks.rb", "spec/freshbooks_spec.rb"]
   s.has_rdoc = false
   s.homepage = %q{http://github.com/elucid/ruby-freshbooks}
   s.require_paths = ["lib"]
