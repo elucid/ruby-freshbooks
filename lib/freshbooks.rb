@@ -52,7 +52,7 @@ module FreshBooks
     # FreshBooks API is POST only
     def post(method, params={}) # :nodoc:
       Response.new Client.post(api_url,
-                               :basic_auth => @auth,
+                               :headers => auth,
                                :body => Client.xml_body(method, params))
     end
 
@@ -105,7 +105,14 @@ module FreshBooks
 
     def initialize(domain, token)
       @domain = domain
-      @auth = { :username => token, :password => 'X' }
+      @username = token
+      @password = 'X'
+    end
+
+    def auth
+      { 'Authorization' =>
+        # taken from lib/net/http.rb
+        'Basic ' + ["#{@username}:#{@password}"].pack('m').delete("\r\n") }
     end
   end
 end
