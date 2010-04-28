@@ -69,8 +69,8 @@ module FreshBooks
       # be used in a context where some other library hasn't
       # already defined #to_xml on Hash...
       case obj
-      when Hash  : obj.each { |k,v| xml.tag!(k) { build_xml(v, xml) } }
-      when Array : obj.each { |e| build_xml(e ,xml) }
+      when Hash  then obj.each { |k,v| xml.tag!(k) { build_xml(v, xml) } }
+      when Array then obj.each { |e| build_xml(e ,xml) }
       else xml.text! obj.to_s
       end
       xml.target!
