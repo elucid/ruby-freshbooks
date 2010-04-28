@@ -56,8 +56,8 @@ describe "XML generation:" do
 end
 
 describe "FreshBooks Client instantiation" do
-  it "should create a Client instance when Connection.new is called" do
+  it "should create a TokenClient instance when Connection.new is called" do
     c = FreshBooks::Connection.new('foo.freshbooks.com', 'abcdefghijklm')
-    c.should be_a(FreshBooks::Client)
+    c.should be_a(FreshBooks::TokenClient)
   end
 end

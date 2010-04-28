@@ -33,12 +33,11 @@ module FreshBooks
   # FreshBooks API client. instances are FreshBooks account
   # specific so you can, e.g. setup two clients and copy/
   # sync data between them
-  class Client
+  module Client
     include HTTParty
 
-    def initialize(domain, token)
-      @domain = domain
-      @auth = { :username => token, :password => 'X' }
+    def self.new(*args)
+      TokenClient.new(*args)
     end
 
     def api_url                 # :nodoc:
@@ -52,9 +51,9 @@ module FreshBooks
     # note: we only need to provide a #post method because the
     # FreshBooks API is POST only
     def post(method, params={}) # :nodoc:
-      Response.new self.class.post(api_url,
-                                   :basic_auth => @auth,
-                                   :body => self.class.xml_body(method, params))
+      Response.new Client.post(api_url,
+                               :basic_auth => @auth,
+                               :body => Client.xml_body(method, params))
     end
 
     # takes nested Hash/Array combos and generates isomorphic
@@ -98,6 +97,15 @@ module FreshBooks
       def method_missing(sym, *args)
         client.post "#{namespace}.#{sym}", *args
       end
+    end
+  end
+
+  class TokenClient
+    include Client
+
+    def initialize(domain, token)
+      @domain = domain
+      @auth = { :username => token, :password => 'X' }
     end
   end
 end
