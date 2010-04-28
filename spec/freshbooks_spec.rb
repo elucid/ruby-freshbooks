@@ -1,7 +1,7 @@
 require 'freshbooks'
 
 def build_xml(data)
-  FreshBooks::Connection.build_xml data
+  FreshBooks::Client.build_xml data
 end
 
 describe "XML generation:" do
@@ -52,5 +52,12 @@ describe "XML generation:" do
       data = {"foo" => [{"bar" => "baz"}, {"bar" => "baz"}]}
       build_xml(data).should == "<foo><bar>baz</bar><bar>baz</bar></foo>"
     end
+  end
+end
+
+describe "FreshBooks Client instantiation" do
+  it "should create a Client instance when Connection.new is called" do
+    c = FreshBooks::Connection.new('foo.freshbooks.com', 'abcdefghijklm')
+    c.should be_a(FreshBooks::Client)
   end
 end

@@ -22,10 +22,18 @@ module FreshBooks
     end
   end
 
-  # FreshBooks API connection. instances are FreshBooks account
-  # specific so you can, e.g. setup two connections and copy/
+  class Connection              # :nodoc:
+    # <b>DEPRECATED:</b> Please use <tt>FreshBooks::Client.new</tt> instead.
+    def self.new(*args)
+      warn "[DEPRECATED] `FreshBooks::Connection` is deprecated.  Please use `FreshBooks::Client` instead."
+      Client.new(*args)
+    end
+  end
+
+  # FreshBooks API client. instances are FreshBooks account
+  # specific so you can, e.g. setup two clients and copy/
   # sync data between them
-  class Connection
+  class Client
     include HTTParty
 
     def initialize(domain, token)
@@ -77,7 +85,7 @@ module FreshBooks
     end
 
     # infer API methods based on 2-deep method chains sent to
-    # connections. this allows us to provide a simple interface
+    # clients. this allows us to provide a simple interface
     # without actually knowing anything about the supported API
     # methods (and hence trusting users to read the official
     # FreshBooks API documentation)
@@ -86,9 +94,9 @@ module FreshBooks
     end
 
     # nothing to see here...
-    class NamespaceProxy < Struct.new(:conn, :namespace) # :nodoc:
+    class NamespaceProxy < Struct.new(:client, :namespace) # :nodoc:
       def method_missing(sym, *args)
-        conn.post "#{namespace}.#{sym}", *args
+        client.post "#{namespace}.#{sym}", *args
       end
     end
   end
