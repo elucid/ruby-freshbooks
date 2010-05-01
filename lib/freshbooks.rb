@@ -1,5 +1,7 @@
 require 'httparty'
 require 'builder'
+require 'openssl'
+require 'cgi'
 
 module FreshBooks
   API_VERSION = '2.1'
@@ -36,8 +38,18 @@ module FreshBooks
   module Client
     include HTTParty
 
+    # :call-seq:
+    #   new(domain, api_token) => FreshBooks::TokenClient
+    #   new(domain, consumer_key, consumer_secret, token, token_secret) => FreshBooks::OAuthClient
+    #
+    # creates a new FreshBooks API client. returns the appropriate client
+    # type based on the authorization arguments provided
     def self.new(*args)
-      TokenClient.new(*args)
+      case args.size
+      when 2 then TokenClient.new(*args)
+      when 5 then OAuthClient.new(*args)
+      else raise ArgumentError
+      end
     end
 
     def api_url                 # :nodoc:
@@ -100,12 +112,13 @@ module FreshBooks
     end
   end
 
+  # Basic Auth client. uses an account's API token.
   class TokenClient
     include Client
 
-    def initialize(domain, token)
+    def initialize(domain, api_token)
       @domain = domain
-      @username = token
+      @username = api_token
       @password = 'X'
     end
 
@@ -113,6 +126,47 @@ module FreshBooks
       { 'Authorization' =>
         # taken from lib/net/http.rb
         'Basic ' + ["#{@username}:#{@password}"].pack('m').delete("\r\n") }
+    end
+  end
+
+  # OAuth 1.0 client. access token and secret must be obtained elsewhere.
+  # cf. the {oauth gem}[http://oauth.rubyforge.org/]
+  class OAuthClient
+    include Client
+
+    def initialize(domain, consumer_key, consumer_secret, token, token_secret)
+      @domain          = domain
+      @consumer_key    = consumer_key
+      @consumer_secret = consumer_secret
+      @token           = token
+      @token_secret    = token_secret
+    end
+
+    def auth
+      data = {
+        :realm                  => '',
+        :oauth_version          => '1.0',
+        :oauth_consumer_key     => @consumer_key,
+        :oauth_token            => @token,
+        :oauth_timestamp        => timestamp,
+        :oauth_nonce            => nonce,
+        :oauth_signature_method => 'PLAINTEXT',
+        :oauth_signature        => signature,
+      }.map { |k,v| %Q[#{k}="#{v}"] }.join(',')
+
+      { 'Authorization' => "OAuth #{data}" }
+    end
+
+    def signature
+      CGI.escape("#{@consumer_secret}&#{@token_secret}")
+    end
+
+    def nonce
+      [OpenSSL::Random.random_bytes(10)].pack('m').gsub(/\W/, '')
+    end
+
+    def timestamp
+      Time.now.to_i
     end
   end
 end
