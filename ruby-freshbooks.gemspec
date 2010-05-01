@@ -5,9 +5,9 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Justin Giancola"]
   s.date = %q{2010-04-25}
-  s.description = %q{simple FreshBooks API wrapper}
+  s.description = %q{simple FreshBooks API wrapper. supports both OAuth and API token authentication}
   s.email = %q{elucid@gmail.com}
-  s.files = ["README.md", "LICENSE", "VERSION", "ruby-freshbooks.gemspec", "lib/freshbooks.rb", "lib/ruby-freshbooks.rb", "spec/freshbooks_spec.rb"]
+  s.files = ["README.md", "LICENSE", "VERSION", "CHANGELOG", "ruby-freshbooks.gemspec", "lib/freshbooks.rb", "lib/ruby-freshbooks.rb", "spec/freshbooks_spec.rb"]
   s.has_rdoc = false
   s.homepage = %q{http://github.com/elucid/ruby-freshbooks}
   s.require_paths = ["lib"]

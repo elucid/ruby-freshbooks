@@ -1,0 +1,8 @@
+== 0.2.0
+ * added support for OAuth authentication
+
+== 0.1.2
+ * allow users to either require 'ruby-freshbooks' or require 'freshbooks'
+
+== 0.1.1
+ * initial release

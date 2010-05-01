@@ -4,8 +4,8 @@ This is a Ruby wrapper for the [FreshBooks](http://www.freshbooks.com) API. This
 
 For example,
 
-    conn = FreshBooks::Connection.new('youraccount.freshbooks.com', 'yourfreshbooksapitoken')
-    conn.client.get :client_id => 2
+    c = FreshBooks::Client.new('youraccount.freshbooks.com', 'yourfreshbooksapitoken')
+    c.client.get :client_id => 2
 
 generates the XML:
 
@@ -20,8 +20,8 @@ purely based on the request arguments. This library doesn't actually know anythi
 
 The following call will generate and POST the invoice create XML shown in the [FreshBooks API Documentation](http://developers.freshbooks.com/api/view/invoices/):
 
-    conn = FreshBooks::Connection.new('youraccount.freshbooks.com', 'yourfreshbooksapitoken')
-    conn.invoice.create(:invoice => {
+    c = FreshBooks::Client.new('youraccount.freshbooks.com', 'yourfreshbooksapitoken')
+    c.invoice.create(:invoice => {
                           :client_id     => 13,
                           :number        => 'FB00004',
                           :status        => 'draft',
@@ -59,11 +59,25 @@ The following call will generate and POST the invoice create XML shown in the [F
 
 ## Examples
 
-You can call any `#{namespace}.#{method_name}` method chain against a `FreshBooks::Connection` instance and it will POST a request to the corresponding FreshBooks API method. i.e.
+You can call any `#{namespace}.#{method_name}` method chain against a `FreshBooks::Client` instance and it will POST a request with the corresponding FreshBooks API method. i.e.
 
-    conn = FreshBooks::Connection.new('youraccount.freshbooks.com', 'yourfreshbooksapitoken')
-    conn.client.get   :client_id => 37
-    conn.invoice.list :client_id => 37, :page => 2, :per_page => 10
+    c = FreshBooks::Client.new('youraccount.freshbooks.com', 'yourfreshbooksapitoken')
+    c.client.get   :client_id => 37
+    c.invoice.list :client_id => 37, :page => 2, :per_page => 10
+
+## Authentication
+
+You can authenticate using either API tokens or [OAuth](http://oauth.net/). The `FreshBooks::Client.new` constructor will create a client instance of the appropriate type depending on the arguments you pass in. so
+
+    c = FreshBooks::Client.new('youraccount.freshbooks.com', 'yourfreshbooksapitoken')
+
+will return a `FreshBooks::TokenClient` instance, and
+
+    c = FreshBooks::Client.new('youraccount.freshbooks.com', 'your_consumer_key', 'your_consumer_secret', 'your_access_token', 'your_access_token_secret')
+
+will return a `FreshBooks::OAuthClient` instance. both client classes work identically aside from how they authenticate requests.
+
+*note:* this library provides no suppport for obtaining OAuth request or access tokens. for help with that take a look at [FreshBooks' OAuth Documentation](http://developers.freshbooks.com/api/oauth/) and the [oauth gem](http://oauth.rubyforge.org/).
 
 ## Goals
 
@@ -74,10 +88,10 @@ You can call any `#{namespace}.#{method_name}` method chain against a `FreshBook
 
 * seamless integration with FreshBooks API via an object interface. i.e.
 
-<pre><code>clients = FreshBooks::Client.list
-client = clients.first
-client.first_name = 'Swenson'
-client.update
+<pre><code>invoices = FreshBooks::Invoice.list
+invoice = invoices.first
+invoice.amount = 500.00
+invoice.update
 </code></pre>
 
 if you want this sort of thing, please use [freshbooks.rb](http://github.com/bcurren/freshbooks.rb) instead
@@ -86,7 +100,7 @@ if you want this sort of thing, please use [freshbooks.rb](http://github.com/bcu
 
 Maybe you should. It depends on what you want to do. I've used freshbooks.rb before but there were a few things that didn't work for me:
 
-* global connection. I've had the need to connect to multiple FreshBooks accounts within the same program to do things like sync or migrate data. you can't do this with freshbooks.rb because the global connection is owned by `FreshBooks::Base` which is the superclass of `Client`, `Invoice`, etc.
+* global connection. I've had the need to connect to multiple FreshBooks accounts within the same program to do things like sync or migrate data. you can't do this with freshbooks.rb because the global connection is owned by `FreshBooks::Base` which is the superclass of `Item`, `Invoice`, etc.
 * requiring a library update every time the FreshBooks API changes. although this doesn't happen very often, it's a little annoying to have to manually patch freshbooks.rb when it does.
 * having to convert everything to and from the business objects the library provides. because the freshbooks.rb API is nice and abstract, it's easy to play around with invoices, clients, etc. as business objects. however, this is less convenient for mass import/export type programs because your data has to be pushed through that object interface instead of just transformed into YAML, CSV, etc. it's also less than desirable when your integration makes use of an alternate model class (i.e. an `ActiveRecord` subclass that you're using to save your FreshBooks data into a database).
 * data transparency. if you're just exploring the FreshBooks API, you might not know all of the attributes that some data types exposes. if you are getting back nicely packaged objects, you'll need to read through the documentation (or source code of freshbooks.rb if you're sure some property ought to be there but isn't and you suspect it's missing from the mapping) to see what you have access to.
