@@ -110,6 +110,39 @@ module FreshBooks
         client.post "#{namespace}.#{sym}", *args
       end
     end
+
+    class FreshBooksAPIRequest < HTTParty::Request
+      private
+      # HACK
+      # FreshBooks' API unfortunately redirects to a login search
+      # html page if you specify an endpoint that doesn't exist
+      # (i.e. typo in subdomain) instead of returning a 404
+      def handle_response
+        if loc = last_response['location'] and loc.match /loginSearch\.php$/
+          resp = Net::HTTPNotFound.new(1.1, 404, "Not Found")
+          resp.instance_variable_set :@read, true
+          resp.instance_variable_set :@body, <<EOS
+<?xml version="1.0" encoding="utf-8"?>
+<response xmlns="http://www.freshbooks.com/api/" status="fail">
+  <error>Not Found. Verify FreshBooks API endpoint</error>
+</response>
+EOS
+          self.last_response = resp
+        end
+        super
+      end
+    end
+
+    def self.post(path, options={}) # :nodoc:
+      perform_freshbooks_api_request Net::HTTP::Post, path, options
+    end
+
+    private
+    def self.perform_freshbooks_api_request(http_method, path, options) #:nodoc:
+      options = default_options.dup.merge(options)
+      process_cookies(options)
+      FreshBooksAPIRequest.new(http_method, path, options).perform
+    end
   end
 
   # Basic Auth client. uses an account's API token.
