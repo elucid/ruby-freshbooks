@@ -72,6 +72,7 @@ module FreshBooks
     # XML bodies to be POSTed to FreshBooks API
     def self.xml_body(method, params)
       xml = Builder::XmlMarkup.new
+      xml.instruct! :xml, :version=>"1.0", :encoding=>"utf-8"
       xml.tag!("request", :method => method) do
         build_xml(params, xml)
       end
