@@ -1,3 +1,6 @@
+== 0.3.0
+ * added LoggingClient example, pretty printing for generated xml, terrible hack to cover weird response FreshBooks' API gives instead of 404s
+
 == 0.2.0
  * added support for OAuth authentication
 
