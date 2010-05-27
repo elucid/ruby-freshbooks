@@ -1,3 +1,6 @@
+== 0.3.1
+ * *actually* add LoggingClient example
+
 == 0.3.0
  * added LoggingClient example, pretty printing for generated xml, terrible hack to cover weird response FreshBooks' API gives instead of 404s
 
