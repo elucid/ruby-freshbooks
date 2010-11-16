@@ -55,9 +55,37 @@ describe "XML generation:" do
   end
 end
 
-describe "FreshBooks Client instantiation" do
-  it "should create a TokenClient instance when Connection.new is called" do
-    c = FreshBooks::Connection.new('foo.freshbooks.com', 'abcdefghijklm')
-    c.should be_a(FreshBooks::TokenClient)
+describe "FreshBooks Client" do
+ describe "instantiation" do
+    it "should create a TokenClient instance when Connection.new is called" do
+      c = FreshBooks::Connection.new('foo.freshbooks.com', 'abcdefghijklm')
+      c.should be_a(FreshBooks::TokenClient)
+    end
+  end
+
+  describe "proxies" do
+    before(:each) do
+      @c = FreshBooks::Connection.new('foo.freshbooks.com', 'abcdefghijklm')
+    end
+
+    it "should not hit API for single method send" do
+      @c.should_not_receive(:post)
+      @c.invoice
+    end
+
+    it "should hit API for normal double method send" do
+      @c.should_receive(:post, "invoice.list").once
+      @c.invoice.list
+    end
+
+    it "should not hit API for subordinate resource double method send" do
+      @c.should_not_receive(:post)
+      @c.invoice.lines
+    end
+
+    it "should hit API for subordinate resource triple method send" do
+      @c.should_receive(:post, "invoice.items.add").once
+      @c.invoice.lines.add
+    end
   end
 end

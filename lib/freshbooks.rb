@@ -101,10 +101,10 @@ module FreshBooks
       xml.target!
     end
 
-    # infer API methods based on 2-deep method chains sent to
-    # clients. this allows us to provide a simple interface
-    # without actually knowing anything about the supported API
-    # methods (and hence trusting users to read the official
+    # infer API methods based on 2-(and sometimes 3) deep method
+    # chains sent to clients. this allows us to provide a simple
+    # interface without actually knowing anything about the supported
+    # API methods (and hence trusting users to read the official
     # FreshBooks API documentation)
     def method_missing(sym, *args) # :nodoc:
       NamespaceProxy.new self, sym
@@ -113,7 +113,13 @@ module FreshBooks
     # nothing to see here...
     class NamespaceProxy < Struct.new(:client, :namespace) # :nodoc:
       def method_missing(sym, *args)
-        client.post "#{namespace}.#{sym}", *args
+        # check for subordinate resources
+        if [:invoice, :recurring].include?(namespace) and
+            sym == :lines
+          NamespaceProxy.new client, "#{namespace}.#{sym}"
+        else
+          client.post "#{namespace}.#{sym}", *args
+        end
       end
     end
 

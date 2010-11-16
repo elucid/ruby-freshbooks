@@ -1,3 +1,6 @@
+== 0.4.0
+ * added support for (invoice|recurring).line methods
+
 == 0.3.1
  * *actually* add LoggingClient example
 
