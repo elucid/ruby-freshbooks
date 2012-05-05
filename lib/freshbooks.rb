@@ -129,7 +129,7 @@ module FreshBooks
       # FreshBooks' API unfortunately redirects to a login search
       # html page if you specify an endpoint that doesn't exist
       # (i.e. typo in subdomain) instead of returning a 404
-      def handle_response
+      def handle_response(body=nil)
         if loc = last_response['location'] and loc.match /loginSearch\.php$/
           resp = Net::HTTPNotFound.new(1.1, 404, "Not Found")
           resp.instance_variable_set :@read, true
