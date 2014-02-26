@@ -63,9 +63,15 @@ module FreshBooks
     # note: we only need to provide a #post method because the
     # FreshBooks API is POST only
     def post(method, params={}) # :nodoc:
-      Response.new Client.post(api_url,
+      resp = Client.post(api_url,
                                :headers => auth,
                                :body => Client.xml_body(method, params))
+
+      if resp['response'].class == Hash
+        return Response.new resp
+      end
+
+      resp.bytes
     end
 
     # takes nested Hash/Array combos and generates isomorphic
