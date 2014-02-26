@@ -67,11 +67,11 @@ module FreshBooks
                                :headers => auth,
                                :body => Client.xml_body(method, params))
 
-      if resp.class == Hash
+      if resp['response'].class == Hash
         return Response.new resp
       end
 
-      resp
+      resp['response']
     end
 
     # takes nested Hash/Array combos and generates isomorphic
