@@ -71,7 +71,7 @@ module FreshBooks
         return Response.new resp
       end
 
-      resp['response']
+      resp.bytes
     end
 
     # takes nested Hash/Array combos and generates isomorphic
