@@ -56,6 +56,10 @@ module FreshBooks
       "https://#{@domain}/api/#{API_VERSION}/xml-in"
     end
 
+    def user_agent
+      {"User-Agent" => "ruby-freshbooks"}
+    end
+
     # HTTParty (sort of) assumes global connections to services
     # but we can easily avoid that by making an instance method
     # that knows account-specific details that calls its
@@ -63,8 +67,9 @@ module FreshBooks
     # note: we only need to provide a #post method because the
     # FreshBooks API is POST only
     def post(method, params={}) # :nodoc:
+      headers = user_agent.merge(auth)
       Response.new Client.post(api_url,
-                               :headers => auth,
+                               :headers => headers,
                                :body => Client.xml_body(method, params))
     end
 
