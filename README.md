@@ -114,6 +114,7 @@ Maybe you should. It depends on what you want to do. I've used freshbooks.rb bef
 
 * [FreshBooks API Documentation](http://developers.freshbooks.com/api)
 * [Source Code](http://github.com/elucid/ruby-freshbooks)
+* [RapidAPI](https://rapidapi.com/package/FreshbooksAPI/functions?utm_source=FreshbooksGitHub&utm_medium=button)
 
 ## If You Want to Contribute:
 
